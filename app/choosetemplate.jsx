@@ -103,7 +103,7 @@ const ChooseTemplate = () => {
 
             <View style={styles.buttonContainer}>
                 <Pressable style={styles.backbutton}>
-                    <Text style={styles.backbuttonText}>Without</Text>
+                    <Text style={styles.backbuttonText}>Skip</Text>
                 </Pressable>
                 <Pressable style={styles.button}>
                     <Text style={styles.buttonText}>Next</Text>
@@ -127,13 +127,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     cardContainer: {
-        // backgroundColor: '#fff',
         borderRadius: 14,
         padding: 10,
-        // shadowColor: '#000',
-        // shadowOffset: { width: 0, height: 1 },
-        // shadowOpacity: 0.2,
-        // shadowRadius: 1.5,
         elevation: 3,
         marginBottom: 20,
         // Adjusting contentContainerStyle for ScrollView

@@ -1,74 +1,86 @@
-// import React, { useState, useEffect } from 'react';
-// import { Link } from 'expo-router';
-// import { useRoute } from '@react-navigation/native';
+
+// TODO: Code V1
+
+// import React, { useState, useEffect, useRef } from 'react';
 // import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+// import { useRoute } from '@react-navigation/native';
+// import { Link } from 'expo-router';
 
 // const OtpVerification = () => {
-
 //     const route = useRoute();
-//     const { phoneNumber } = route.params || {}; // Destructure phoneNumber from route params
-//     const maskedPhoneNumber = phoneNumber ? `********${phoneNumber.slice(-3)}` : '**********'; // Mask all but the last two digits
+//     const { phoneNumber } = route.params || {};
+//     const maskedPhoneNumber = phoneNumber ? `********${phoneNumber.slice(-3)}` : '**********';
 
 //     const [otp, setOtp] = useState(['', '', '', '']);
-//     const [timer, setTimer] = useState(10); // 10 seconds countdown
-//     const [resendVisible, setResendVisible] = useState(false); // State to show "Resend" when timer reaches zero
+//     const [timer, setTimer] = useState(10);
+//     const [resendVisible, setResendVisible] = useState(false);
+//     const inputRefs = useRef([]); // Create refs array for each OTP input
 
 //     useEffect(() => {
 //         let interval;
 //         if (timer > 0) {
-//             // Set up a timer that decreases every second
 //             interval = setInterval(() => {
 //                 setTimer((prevTimer) => prevTimer - 1);
 //             }, 1000);
 //         } else {
-//             // When timer reaches zero, show the "Resend" text
 //             setResendVisible(true);
 //         }
-//         // Cleanup the interval on component unmount
 //         return () => clearInterval(interval);
 //     }, [timer]);
 
-
 //     const handleOtpChange = (value, index) => {
-//         const otpCopy = [...otp];
-//         otpCopy[index] = value;
-//         setOtp(otpCopy);
+//         if (/^\d*$/.test(value)) {  // Check if value is a digit
+//             const otpCopy = [...otp];
+//             otpCopy[index] = value;
+//             setOtp(otpCopy);
+
+//             // Move to the next input if value is entered and it's not the last input
+//             if (value && index < otp.length - 1) {
+//                 inputRefs.current[index + 1].focus();
+//             }
+//         }
+//     };
+
+//     const handleKeyPress = (e, index) => {
+//         if (e.nativeEvent.key === 'Backspace' && otp[index] === '' && index > 0) {
+//             inputRefs.current[index - 1].focus(); // Move focus to the previous input on backspace if current is empty
+//         }
 //     };
 
 //     const handleResend = () => {
-//         // Logic for resending OTP
-//         setTimer(60); // Reset the timer to 90 seconds
-//         setResendVisible(false); // Hide "Resend" and show the timer again
+//         setTimer(60);
+//         setResendVisible(false);
 //     };
+
 //     const handleSubmit = () => {
 //         // Logic for submitting OTP
 //     };
-
 
 //     return (
 //         <View style={styles.container}>
 //             <Text style={styles.title}>OTP verification</Text>
 //             <Text style={styles.subTitle}>
-//                 Enter the verification code we sent you on: {maskedPhoneNumber}
+//                 Verification code sent to this number:   {maskedPhoneNumber}
+//                 {/* Enter the verification code we sent you on:   {maskedPhoneNumber} */}
 //             </Text>
 //             <View style={styles.otpContainer}>
 //                 {otp.map((digit, index) => (
 //                     <TextInput
 //                         key={index}
+//                         ref={(el) => inputRefs.current[index] = el} // Assign ref to each input
 //                         style={styles.otpInput}
 //                         inputMode="numeric"
 //                         maxLength={1}
 //                         onChangeText={(value) => handleOtpChange(value, index)}
+//                         onKeyPress={(e) => handleKeyPress(e, index)}
 //                         value={digit}
 //                     />
 //                 ))}
 //             </View>
 
-
 //             {resendVisible ? (
 //                 <Pressable onPress={handleResend}>
 //                     <Text style={styles.resendText}>Didn't receive code? <Text style={styles.resendLink}>Resend</Text></Text>
-//                     {/* <Text style={styles.resendLink}>Resend</Text> */}
 //                 </Pressable>
 //             ) : (
 //                 <Text style={styles.timerText}>{`00:${timer < 10 ? `0${timer}` : timer}`}</Text>
@@ -79,13 +91,11 @@
 //                 </Link>
 //             </Pressable>
 
-//             {/* <Pressable onPress={handleButtonClick}> */}
-//             <Pressable >
-//                 <Link href={{ pathname: 'LoginWithPassword', params: { name: 'LoginWithPassword' } }} style={styles.tryAnotherText}>Try another Option?</Link>
-//                 {/* <Link href={{ pathname: 'choosetemplate' }} style={styles.tryAnotherText}>Try another Option?</Link> */}
-//                 {/* <Text style={styles.tryAnotherText}>Try another Option?</Text> */}
+//             <Pressable>
+//                 <Link href={{ pathname: 'LoginWithPassword', params: { name: 'LoginWithPassword' } }} style={styles.tryAnotherText}>
+//                     Try another Option?
+//                 </Link>
 //             </Pressable>
-
 //         </View>
 //     );
 // };
@@ -148,7 +158,6 @@
 //     },
 //     continueButtonText: {
 //         color: '#fff',
-//         // textAlign: 'center',
 //         fontSize: 18,
 //     },
 //     tryAnotherText: {
@@ -161,21 +170,150 @@
 // export default OtpVerification;
 
 
+// TODO: Code V2
+
+// import React, { useState, useEffect, useRef } from 'react';
+// import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+// import { useRoute, useNavigation } from '@react-navigation/native';
+// import { Link } from 'expo-router';
+
+// import { useRouter, useSearchParams } from 'expo-router';
+
+// const OtpVerification = () => {
+//     const route = useRoute();
+//     const navigation = useNavigation();
+//     const { phoneNumber } = route.params || {};
+//     const maskedPhoneNumber = phoneNumber ? `********${phoneNumber.slice(-2)}` : '**********';
+
+//     const [otp, setOtp] = useState(['', '', '', '']);
+//     const [timer, setTimer] = useState(10);
+//     const [resendVisible, setResendVisible] = useState(false);
+//     const inputRefs = useRef([]);
+
+//     useEffect(() => {
+//         let interval;
+//         if (timer > 0) {
+//             interval = setInterval(() => {
+//                 setTimer((prevTimer) => prevTimer - 1);
+//             }, 1000);
+//         } else {
+//             setResendVisible(true);
+//         }
+//         return () => clearInterval(interval);
+//     }, [timer]);
+
+//     const handleOtpChange = (value, index) => {
+//         if (/^\d*$/.test(value)) {
+//             const otpCopy = [...otp];
+//             otpCopy[index] = value;
+//             setOtp(otpCopy);
+
+//             if (value && index < otp.length - 1) {
+//                 inputRefs.current[index + 1].focus();
+//             }
+//         }
+//     };
+
+//     const handleKeyPress = (e, index) => {
+//         if (e.nativeEvent.key === 'Backspace' && otp[index] === '' && index > 0) {
+//             inputRefs.current[index - 1].focus();
+//         }
+//     };
+
+//     const handleResend = () => {
+//         setTimer(60);
+//         setResendVisible(false);
+//     };
+
+//     const handleSubmit = () => {
+//         // Simulate checking if the user exists
+//         const userExists = checkUserExistence(phoneNumber);
+
+//         if (userExists) {
+//             // Navigate to the template page if user exists
+//             // navigation.navigate('choosetemplate');
+//             navigation.navigate('AccountSetup');
+//         } else {
+//             // Navigate to account setup page if user is new
+//             navigation.navigate('AccountSetup');
+//         }
+//     };
+
+//     // Mock function to check user existence - replace with actual API call
+//     const checkUserExistence = (phoneNumber) => {
+//         // Implement the logic to check if the user exists, e.g., API call
+//         // Here, we are just simulating with a random condition
+//         return Math.random() > 0.5; // Replace this with real user existence check
+//     };
+
+//     return (
+//         <View style={styles.container}>
+//             <Text style={styles.title}>OTP verification</Text>
+//             <Text style={styles.subTitle}>
+//                 Enter the verification code we sent you on: {maskedPhoneNumber}
+//             </Text>
+//             <View style={styles.otpContainer}>
+//                 {otp.map((digit, index) => (
+//                     <TextInput
+//                         key={index}
+//                         ref={(el) => inputRefs.current[index] = el}
+//                         style={styles.otpInput}
+//                         keyboardType="numeric"
+//                         maxLength={1}
+//                         onChangeText={(value) => handleOtpChange(value, index)}
+//                         onKeyPress={(e) => handleKeyPress(e, index)}
+//                         value={digit}
+//                     />
+//                 ))}
+//             </View>
+
+//             {resendVisible ? (
+//                 <Pressable onPress={handleResend}>
+//                     <Text style={styles.resendText}>Didn't receive code? <Text style={styles.resendLink}>Resend</Text></Text>
+//                 </Pressable>
+//             ) : (
+//                 <Text style={styles.timerText}>{`00:${timer < 10 ? `0${timer}` : timer}`}</Text>
+//             )}
+//             <Pressable style={styles.continueButton} onPress={handleSubmit}>
+//                 <Text style={styles.continueButtonText}>Continue</Text>
+//             </Pressable>
+
+//             <Pressable>
+//                 <Link href={{ pathname: 'LoginWithPassword', params: { name: 'LoginWithPassword' } }} style={styles.tryAnotherText}>
+//                     Try another Option?
+//                 </Link>
+//             </Pressable>
+//         </View>
+//     );
+// };
+
+
+// TODO: Code V3
 
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+import { useRouter, useSearchParams } from 'expo-router';
 import { Link } from 'expo-router';
+import { useRoute } from '@react-navigation/native';
+// import auth from '@react-native-firebase/auth';
+
 
 const OtpVerification = () => {
     const route = useRoute();
-    const { phoneNumber } = route.params || {};
+    const router = useRouter();
+    // const { confirmation } = useSearchParams(); // Get the confirmation passed from the login page
+
+    const { phoneNumber, confirmation: confirmation, confirm } = route.params || {};
     const maskedPhoneNumber = phoneNumber ? `********${phoneNumber.slice(-3)}` : '**********';
+
+    console.log(phoneNumber);
+    console.log(confirmation);
+    console.log(confirm);
 
     const [otp, setOtp] = useState(['', '', '', '']);
     const [timer, setTimer] = useState(10);
     const [resendVisible, setResendVisible] = useState(false);
-    const inputRefs = useRef([]); // Create refs array for each OTP input
+    const inputRefs = useRef([]);
 
     useEffect(() => {
         let interval;
@@ -189,13 +327,21 @@ const OtpVerification = () => {
         return () => clearInterval(interval);
     }, [timer]);
 
+
+    const verifyOtp = async () => {
+        try {
+            await confirmation.confirm(otp); // Confirm the OTP
+            router.push('/dashboard'); // Navigate to the dashboard
+        } catch (error) {
+            console.log('Invalid OTP:', error);
+        }
+    };
     const handleOtpChange = (value, index) => {
-        if (/^\d*$/.test(value)) {  // Check if value is a digit
+        if (/^\d*$/.test(value)) {
             const otpCopy = [...otp];
             otpCopy[index] = value;
             setOtp(otpCopy);
 
-            // Move to the next input if value is entered and it's not the last input
             if (value && index < otp.length - 1) {
                 inputRefs.current[index + 1].focus();
             }
@@ -204,33 +350,86 @@ const OtpVerification = () => {
 
     const handleKeyPress = (e, index) => {
         if (e.nativeEvent.key === 'Backspace' && otp[index] === '' && index > 0) {
-            inputRefs.current[index - 1].focus(); // Move focus to the previous input on backspace if current is empty
+            inputRefs.current[index - 1].focus();
         }
     };
 
-    const handleResend = () => {
-        setTimer(60);
-        setResendVisible(false);
+    // const handleResend = () => {
+    //     setTimer(60);
+    //     setResendVisible(false);
+    // };
+
+    // const handleSubmit = () => {
+    //     // Simulate checking if the user exists
+    //     // const userExists = checkUserExistence(phoneNumber);
+    //     const userExists = false;
+
+    //     if (userExists) {
+    //         // Navigate to the template page if user exists
+    //         router.push({ pathname: '/choosetemplate' });
+    //     } else {
+    //         // Navigate to account setup page if user is new
+    //         router.push({ pathname: '/AccountSetup' });
+    //     }
+    // };
+
+
+    const handleSubmit = async () => {
+        try {
+            const code = otp.join('');
+            const userCredential = await confirmation.confirm(code); // Confirm OTP
+            const user = userCredential.user;
+
+            // Check if user exists in Firestore
+            const userDocument = await firestore()
+                .collection('users')
+                .doc(user.uid)
+                .get();
+
+            if (userDocument.exists) {
+                router.push({ pathname: '/dashboard' });
+            } else {
+                router.push({ pathname: '/AccountSetup' });
+            }
+        } catch (error) {
+            console.log('Invalid code.', error);
+            Alert.alert('Invalid OTP', 'Please enter the correct OTP.');
+        }
     };
 
-    const handleSubmit = () => {
-        // Logic for submitting OTP
+
+    const handleResend = async () => {
+        try {
+            const newConfirmation = await auth().signInWithPhoneNumber(phoneNumber); // Resend OTP
+            setTimer(60);
+            setResendVisible(false);
+        } catch (error) {
+            console.log("Error resending code: ", error);
+        }
     };
+
+
+    // // Mock function to check user existence - replace with actual API call
+    // const checkUserExistence = (phoneNumber) => {
+    //     // Implement the logic to check if the user exists, e.g., API call
+    //     // Here, we are just simulating with a random condition
+    //     return Math.random() > 0.5; // Replace this with real user existence check
+    // };
+
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>OTP verification</Text>
             <Text style={styles.subTitle}>
-                Verification code sent to this number:   {maskedPhoneNumber}
-                {/* Enter the verification code we sent you on:   {maskedPhoneNumber} */}
+                Enter the verification code we sent you on: {maskedPhoneNumber}
             </Text>
             <View style={styles.otpContainer}>
                 {otp.map((digit, index) => (
                     <TextInput
                         key={index}
-                        ref={(el) => inputRefs.current[index] = el} // Assign ref to each input
+                        ref={(el) => inputRefs.current[index] = el}
                         style={styles.otpInput}
-                        inputMode="numeric"
+                        keyboardType="numeric"
                         maxLength={1}
                         onChangeText={(value) => handleOtpChange(value, index)}
                         onKeyPress={(e) => handleKeyPress(e, index)}
@@ -247,9 +446,7 @@ const OtpVerification = () => {
                 <Text style={styles.timerText}>{`00:${timer < 10 ? `0${timer}` : timer}`}</Text>
             )}
             <Pressable style={styles.continueButton} onPress={handleSubmit}>
-                <Link href={{ pathname: 'choosetemplate' }}>
-                    <Text style={styles.continueButtonText}>Continue</Text>
-                </Link>
+                <Text style={styles.continueButtonText}>Continue</Text>
             </Pressable>
 
             <Pressable>
@@ -329,3 +526,5 @@ const styles = StyleSheet.create({
 });
 
 export default OtpVerification;
+
+

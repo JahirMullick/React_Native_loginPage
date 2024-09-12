@@ -1,4 +1,4 @@
-
+// TODO: Code V1
 // import React from 'react';
 // import { View, Text, TextInput, Pressable, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 // import { useState } from 'react';
@@ -192,19 +192,51 @@
 
 
 
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native';
-import { useState } from 'react';
+import { useRouter } from 'expo-router';
+// import { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth';
+import firebase from '@react-native-firebase/app';
 
-const Login = ({ navigation }) => {
 
+const Login = () => {
+    const router = useRouter();
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [confirm, setConfirm] = useState(null);
+    const [initializing, setInitializing] = useState(true);
     const isPhoneNumberValid = phoneNumber.length === 10 && /^\d+$/.test(phoneNumber); // Checks if phone number has 10 digits and contains only numbers
 
-    const handleButtonClick = () => {
-        // Navigates to the 'OtpVerification' screen
-        navigation.navigate('OtpVerification', { phoneNumber });
+
+    const signInWithPhoneNumber = async (phoneNumber) => {
+        try {
+            const confirmation = await firebase.auth().signInWithPhoneNumber(phoneNumber);
+            setConfirm(confirmation);
+            // ----
+            router.push({
+                pathname: '/otpverification',
+                params: { phoneNumber, confirmation: confirmation, confirm }, // Pass confirmation to OTP page
+            });
+            // ----
+
+        } catch (error) {
+            setMessage(`Error: ${error.message}`);
+        }
+
+        // try {
+        //     const confirmation = await firebase.auth().signInWithPhoneNumber(`+91${phoneNumber}`);
+        //     setConfirm(confirmation);
+        //     // Navigate to OTP verification page, passing the confirmation result
+        //     router.push({
+        //         pathname: '/otpverification',
+        //         params: { confirmation: confirmation }, // Pass confirmation to OTP page
+        //     });
+        // } catch (error) {
+        //     console.log('Error sending OTP:', error);
+        // }
     };
+
 
     return (
         <View style={styles.container}>
@@ -215,6 +247,8 @@ const Login = ({ navigation }) => {
 
                     <View style={styles.listAddress}>
                         <Image source={{ uri: 'https://img.icons8.com/?size=100&id=5402&format=png&color=000000' }} style={styles.icon} />
+
+
                         <TextInput
                             placeholder="Enter phone number"
                             inputMode="phone-pad"
@@ -227,10 +261,12 @@ const Login = ({ navigation }) => {
 
                     <Pressable
                         style={[styles.continueButton, !isPhoneNumberValid && styles.disabledButton]}
-                        onPress={handleButtonClick}
+
+                        onPress={signInWithPhoneNumber}
                         disabled={!isPhoneNumberValid} // Disable button if phone number is not valid
+                    // disabled={phoneNumber.length !== 10} // Disable button if phone number is not valid
                     >
-                        <Text style={styles.continueButtonText}>Continue</Text>
+                        <Text style={styles.continueButtonText}>Send OTP</Text>
                     </Pressable>
                 </View>
             </View>

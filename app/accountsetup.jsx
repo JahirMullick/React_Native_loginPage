@@ -1,27 +1,40 @@
+
+// TODO: Testing purposes
+
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity } from 'react-native';
-import CheckBox from '@react-native-elements/themed';
+import { View, TextInput, Text, Button, CheckBox, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 
-export default function Accountsetup() {
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        agreeToTerms: false,
-    });
 
-    const handleInputChange = (name, value) => {
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
+export default function RegisterScreen() {
+
+    const router = useRouter();
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isAgree, setIsAgree] = useState(false);
 
     const handleRegister = () => {
-        // Handle registration logic here
-        console.log(formData);
+
+        if (!firstName || !lastName || !password) {
+            Alert.alert('Error', 'Please fill in all required fields');
+            return;
+        }
+        if (!isAgree) {
+            Alert.alert('Error', 'You must agree to the terms and privacy policy');
+            return;
+        }
+        // Registration Logic goes here
+        Alert.alert('Success', `Account created for ${firstName} ${lastName}`);
+
+        router.push({ pathname: '/choosetemplate' });
     };
+
+
+    // const handleRegister = () => {
+    //     router.push({ pathname: '/choosetemplate' });
+    // };
 
     return (
         <View style={styles.container}>
@@ -31,43 +44,39 @@ export default function Accountsetup() {
             <TextInput
                 style={styles.input}
                 placeholder="First Name"
-                value={formData.firstName}
-                onChangeText={(value) => handleInputChange('firstName', value)}
+                value={firstName}
+                onChangeText={setFirstName}
             />
 
             <TextInput
                 style={styles.input}
                 placeholder="Last Name"
-                value={formData.lastName}
-                onChangeText={(value) => handleInputChange('lastName', value)}
+                value={lastName}
+                onChangeText={setLastName}
             />
 
             <TextInput
                 style={styles.input}
                 placeholder="Email Address (Optional)"
-                value={formData.email}
-                onChangeText={(value) => handleInputChange('email', value)}
-                keyboardType="email-address"
+                value={email}
+                onChangeText={setEmail}
             />
 
             <TextInput
                 style={styles.input}
                 placeholder="Password"
-                value={formData.password}
-                onChangeText={(value) => handleInputChange('password', value)}
                 secureTextEntry
+                value={password}
+                onChangeText={setPassword}
             />
 
             <View style={styles.checkboxContainer}>
                 <CheckBox
-                    checked={formData.agreeToTerms}
-                    onPress={() => handleInputChange('agreeToTerms', !formData.agreeToTerms)}
+                    value={isAgree}
+                    onValueChange={setIsAgree}
                 />
-                <Text style={styles.checkboxLabel}>
-                    I Agree with
-                    <Text style={styles.link}> Terms of Service </Text>
-                    and
-                    <Text style={styles.link}> Privacy Policy</Text>
+                <Text style={styles.label}>
+                    I Agree with <Text style={styles.link}>Terms of Service</Text> and <Text style={styles.link}>Privacy Policy</Text>
                 </Text>
             </View>
 
@@ -83,48 +92,49 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         justifyContent: 'center',
-        backgroundColor: '#fff',
     },
     title: {
-        fontSize: 24,
+
+        fontSize: '30px',
+        textAlign: 'center',
+        fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: '10%',
     },
     subtitle: {
-        fontSize: 14,
-        color: '#666',
+        fontSize: 16,
+        color: 'gray',
         marginBottom: 20,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#ccc',
         padding: 10,
-        marginBottom: 15,
-        borderRadius: 5,
+        borderRadius: 10,
+        marginBottom: '7%',
+        height: '50px',
     },
     checkboxContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
         marginBottom: 20,
+        alignItems: 'center',
     },
-    checkboxLabel: {
+    label: {
         marginLeft: 8,
         fontSize: 14,
-        color: '#333',
     },
     link: {
-        color: '#2e64e5',
+        color: 'blue',
         textDecorationLine: 'underline',
     },
     button: {
-        backgroundColor: '#004225',
-        padding: 15,
+        backgroundColor: '#0c6a47',
+        paddingVertical: 10,
         borderRadius: 5,
-        alignItems: 'center',
     },
     buttonText: {
         color: '#fff',
-        fontSize: 16,
+        textAlign: 'center',
         fontWeight: 'bold',
     },
 });
