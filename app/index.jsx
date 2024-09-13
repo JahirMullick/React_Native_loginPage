@@ -193,50 +193,171 @@
 
 
 
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
+// import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native';
+// import { useRouter } from 'expo-router';
+
+// const Login = () => {
+//     const router = useRouter();
+//     const [phoneNumber, setPhoneNumber] = useState('');
+//     const isPhoneNumberValid = phoneNumber.length === 10 && /^\d+$/.test(phoneNumber); // Checks if phone number has 10 digits and contains only numbers
+
+
+//     const signInWithPhoneNumber = () => {
+//          // Redirect to OTP page with confirmation and phoneNumber
+//             router.push({
+//                 pathname: '/otpverification',
+//                 query: { phoneNumber }, // Pass confirmation as a string
+//             });
+
+//         }
+
+
+
+//         // try {
+//         //     const confirmation = await firebase.auth().signInWithPhoneNumber(`+91${phoneNumber}`);
+//         //     setConfirm(confirmation);
+//         //     // Navigate to OTP verification page, passing the confirmation result
+//         //     router.push({
+//         //         pathname: '/otpverification',
+//         //         params: { confirmation: confirmation }, // Pass confirmation to OTP page
+//         //     });
+//         // } catch (error) {
+//         //     console.log('Error sending OTP:', error);
+//         // }
+//     };
+
+
+//     return (
+//         <View style={styles.container}>
+//             <View style={styles.glasseffect}>
+//                 <View style={styles.drawer}>
+//                     <Text style={styles.drawerHeader}>Login</Text>
+//                     <Text style={styles.drawerSubHeader}>Enter your number to proceed</Text>
+
+//                     <View style={styles.listAddress}>
+//                         <Image source={{ uri: 'https://img.icons8.com/?size=100&id=5402&format=png&color=000000' }} style={styles.icon} />
+
+
+//                         <TextInput
+//                             placeholder="Enter phone number"
+//                             inputMode="phone-pad"
+//                             onChangeText={setPhoneNumber}
+//                             value={phoneNumber}
+//                             maxLength={10} // Limit input to 10 characters
+//                             style={styles.phoneNumber}
+//                         />
+//                     </View>
+
+//                     <Pressable
+//                         style={[styles.continueButton, !isPhoneNumberValid && styles.disabledButton]}
+//                         onPress={signInWithPhoneNumber}
+//                         disabled={!isPhoneNumberValid} // Disable button if phone number is not valid
+//                     // disabled={phoneNumber.length !== 10} // Disable button if phone number is not valid
+//                     >
+//                         <Text style={styles.continueButtonText}>Send OTP</Text>
+//                     </Pressable>
+
+//                     {/* {message && <Text>{message}</Text>} */}
+//                 </View>
+//             </View>
+//         </View>
+//     );
+// };
+
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         justifyContent: 'center',
+//     },
+//     glasseffect: {
+//         backgroundColor: 'rgba(0, 0, 0, 0.1)',
+//         height: '100%',
+//         justifyContent: 'center',
+//     },
+//     drawer: {
+//         marginBottom: '-87%',
+//         height: '60%',
+//         width: '100%',
+//         backgroundColor: '#FFFFFF',
+//         borderTopLeftRadius: 24,
+//         borderTopRightRadius: 24,
+//         padding: 20,
+//         elevation: 5,
+//     },
+//     drawerHeader: {
+//         fontSize: 30,
+//         fontWeight: '700',
+//         color: '#101010',
+//         marginBottom: 10,
+//     },
+//     drawerSubHeader: {
+//         fontSize: 14,
+//         fontWeight: '500',
+//         color: '#878787',
+//         marginBottom: 20,
+//     },
+//     listAddress: {
+//         flexDirection: 'row',
+//         alignItems: 'center',
+//         justifyContent: 'space-between',
+//         borderWidth: 1,
+//         borderColor: '#318616',
+//         borderRadius: 16,
+//         padding: 15,
+//         marginBottom: 20,
+//     },
+//     icon: {
+//         width: 24,
+//         height: 24,
+//     },
+//     phoneNumber: {
+//         fontSize: 16,
+//         color: '#101010',
+//         width: '90%',
+//     },
+//     continueButton: {
+//         backgroundColor: '#156651',
+//         borderRadius: 11,
+//         paddingVertical: 16,
+//         alignItems: 'center',
+//         marginBottom: 20,
+//     },
+//     continueButtonText: {
+//         color: '#FFFFFF',
+//         fontSize: 14,
+//         fontWeight: '600',
+//     },
+//     disabledButton: {
+//         backgroundColor: '#c7c7c7', // Lighter color for the disabled state
+//     },
+// });
+
+// export default Login;
+
+
+
+
+
+
+
+
+import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-// import { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import auth from '@react-native-firebase/auth';
-import firebase from '@react-native-firebase/app';
-
 
 const Login = () => {
     const router = useRouter();
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [confirm, setConfirm] = useState(null);
-    const [initializing, setInitializing] = useState(true);
     const isPhoneNumberValid = phoneNumber.length === 10 && /^\d+$/.test(phoneNumber); // Checks if phone number has 10 digits and contains only numbers
 
-
-    const signInWithPhoneNumber = async (phoneNumber) => {
-        try {
-            const confirmation = await firebase.auth().signInWithPhoneNumber(phoneNumber);
-            setConfirm(confirmation);
-            // ----
-            router.push({
-                pathname: '/otpverification',
-                params: { phoneNumber, confirmation: confirmation, confirm }, // Pass confirmation to OTP page
-            });
-            // ----
-
-        } catch (error) {
-            setMessage(`Error: ${error.message}`);
-        }
-
-        // try {
-        //     const confirmation = await firebase.auth().signInWithPhoneNumber(`+91${phoneNumber}`);
-        //     setConfirm(confirmation);
-        //     // Navigate to OTP verification page, passing the confirmation result
-        //     router.push({
-        //         pathname: '/otpverification',
-        //         params: { confirmation: confirmation }, // Pass confirmation to OTP page
-        //     });
-        // } catch (error) {
-        //     console.log('Error sending OTP:', error);
-        // }
+    const signInWithPhoneNumber = () => {
+        // Redirect to OTP page with confirmation and phoneNumber
+        router.push({
+            pathname: '/otpverification',
+            query: { phoneNumber }, // Pass phoneNumber as a query param
+        });
     };
-
 
     return (
         <View style={styles.container}>
@@ -248,10 +369,9 @@ const Login = () => {
                     <View style={styles.listAddress}>
                         <Image source={{ uri: 'https://img.icons8.com/?size=100&id=5402&format=png&color=000000' }} style={styles.icon} />
 
-
                         <TextInput
                             placeholder="Enter phone number"
-                            inputMode="phone-pad"
+                            keyboardType="phone-pad"
                             onChangeText={setPhoneNumber}
                             value={phoneNumber}
                             maxLength={10} // Limit input to 10 characters
@@ -261,10 +381,8 @@ const Login = () => {
 
                     <Pressable
                         style={[styles.continueButton, !isPhoneNumberValid && styles.disabledButton]}
-
                         onPress={signInWithPhoneNumber}
                         disabled={!isPhoneNumberValid} // Disable button if phone number is not valid
-                    // disabled={phoneNumber.length !== 10} // Disable button if phone number is not valid
                     >
                         <Text style={styles.continueButtonText}>Send OTP</Text>
                     </Pressable>
@@ -272,7 +390,7 @@ const Login = () => {
             </View>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {

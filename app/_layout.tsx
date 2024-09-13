@@ -18,15 +18,8 @@
 
 import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
-import firebase from '@react-native-firebase/app';
 
 export default function RootLayout() {
-  // useEffect(() => {
-  //   // Initialize Firebase only if it hasn't been initialized already
-  //   if (!firebase.apps.length) {
-  //     firebase.initializeApp();  // No need for config object here
-  //   }
-  // }, []);
 
   return (
     <Stack>
